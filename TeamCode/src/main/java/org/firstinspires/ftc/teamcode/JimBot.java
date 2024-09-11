@@ -20,6 +20,9 @@ public class JimBot extends LinearOpMode {
 
     ElapsedTime turnTime = new ElapsedTime();
 
+    double WHEEL_BASE = 16; // Front to back distance of the wheels
+    double TRACK_WIDTH = 16; // Side to side distance of the wheels
+
 
     @Override
     public void runOpMode() {
@@ -152,10 +155,6 @@ public class JimBot extends LinearOpMode {
     }
 
 
-    double WHEEL_BASE = 16; // Front to back distance of the wheels
-    double TRACK_WIDTH = 16; // Side to side distance of the wheels
-    double WHEEL_RADIUS = 3;
-
     // Rotates while going along a curve similar to how a car works
     // Larger turning Radius is smaller turn amount
     // Positive radius is turning right
@@ -174,7 +173,7 @@ public class JimBot extends LinearOpMode {
         double IPower = velocity * innerRadius;
         double OPower = velocity * outerRadius;
 
-        // Turning one way needs the opposite calculations as turning the other. This just reverses that
+        // Turning one way needs the opposite calculations as turning the other. This just reverses it
         if (turningRadius > 0) // Turning Right
         {
             FLServo.setPosition(OAngle);
@@ -198,7 +197,6 @@ public class JimBot extends LinearOpMode {
             BRMotor.setPower(OPower);
             FRMotor.setPower(OPower);
         }
-
 
     }
 
