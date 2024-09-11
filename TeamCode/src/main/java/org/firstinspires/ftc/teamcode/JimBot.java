@@ -30,11 +30,11 @@ public class JimBot extends LinearOpMode {
         while (opModeIsActive()) {
             double speed = gamepad1.right_trigger + (-gamepad1.left_trigger); // Makes it so that the triggers cancel each other out if both are pulled at the same time
             double angle = gamepad1.right_stick_x;
-            if(speed!=0)
+            if (speed != 0)
                 move(gamepad1.left_stick_x, speed);
-            else if(angle!=0)
+            else if (angle != 0)
                 rotate(angle);
-            else{
+            else {
                 FRMotor.setPower(0);
                 BLMotor.setPower(0);
                 BRMotor.setPower(0);
@@ -86,14 +86,14 @@ public class JimBot extends LinearOpMode {
         BRServo.scaleRange(0.0, 1.0);
         FRServo.scaleRange(0.0, 1.0);
 
-        double[] test = cartesianToPolar(1, 0);
-
     }
 
 
-    // Converts cartesian coordinates to polar
-    // 0 = r
-    // 1 = theta
+    /*
+    Converts cartesian coordinates to polar
+    0 = r
+    1 = theta
+    */
     public double[] cartesianToPolar(double x, double y) {
         double[] arrayToReturn = new double[2];
         arrayToReturn[0] = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)); // Radius
@@ -117,15 +117,9 @@ public class JimBot extends LinearOpMode {
         return arrayToReturn;
     }
 
-    //double oldH = 0;
 
-    //oldH newH not used maybe later to have motors wait to turn wheel until Servo is in right position
+    // Moves the robot in a straight line using heading power
     public void move(double heading, double power) {
-        //double newH;
-        /*
-        /if(newH>=oldH-5 && newH <=oldH+5)
-            oldH = newH;
-         */
 
         heading = (heading + 1) / 2;
 
@@ -134,16 +128,15 @@ public class JimBot extends LinearOpMode {
         BRServo.setPosition(heading);
         FRServo.setPosition(heading);
 
-        //if(turnTime<)
 
         FLMotor.setPower(power);
         BLMotor.setPower(power);
         BRMotor.setPower(power);
         FRMotor.setPower(power);
-        //oldH = newH;
     }
 
-    public void rotate(double angle){
+    // Rotates the robot around the center point
+    public void rotate(double angle) {
 
         //set wheels for rotation
         FLServo.setPosition(.25);
@@ -156,6 +149,56 @@ public class JimBot extends LinearOpMode {
         BLMotor.setPower(angle);
         BRMotor.setPower(angle);
         FRMotor.setPower(angle);
+    }
+
+
+    double WHEEL_BASE = 16; // Front to back distance of the wheels
+    double TRACK_WIDTH = 16; // Side to side distance of the wheels
+    double WHEEL_RADIUS = 3;
+
+    // Rotates while going along a curve similar to how a car works
+    // Larger turning Radius is smaller turn amount
+    // Positive radius is turning right
+    // Negative radius is turning right
+    public void rotateAlongCurve(double velocity, double turningRadius) {
+
+        // Calculates the turning radius of the inside and outside wheels from the turning radius of the center
+        double innerRadius = turningRadius - (TRACK_WIDTH / 2);
+        double outerRadius = turningRadius + (TRACK_WIDTH / 2);
+
+        // Calculates the different turning radius for the inner and outer sets of wheels
+        double IAngle = Math.atan(WHEEL_BASE / innerRadius);
+        double OAngle = Math.atan(WHEEL_BASE / outerRadius);
+
+        // Calculates the power for the inner and outer sets of wheels
+        double IPower = velocity * innerRadius;
+        double OPower = velocity * outerRadius;
+
+        // Turning one way needs the opposite calculations as turning the other. This just reverses that
+        if (turningRadius > 0) // Turning Right
+        {
+            FLServo.setPosition(OAngle);
+            BLServo.setPosition(OAngle);
+            BRServo.setPosition(IAngle);
+            FRServo.setPosition(IAngle);
+
+            FLMotor.setPower(OPower);
+            BLMotor.setPower(OPower);
+            BRMotor.setPower(IPower);
+            FRMotor.setPower(IPower);
+        } else // Turning Left
+        {
+            FLServo.setPosition(IAngle);
+            BLServo.setPosition(IAngle);
+            BRServo.setPosition(OAngle);
+            FRServo.setPosition(OAngle);
+
+            FLMotor.setPower(IPower);
+            BLMotor.setPower(IPower);
+            BRMotor.setPower(OPower);
+            FRMotor.setPower(OPower);
+        }
+
 
     }
 
